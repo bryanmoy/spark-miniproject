@@ -1,0 +1,125 @@
+<h1>Spark MiniProject</h1>
+
+<p>In this mini project, you will use Apache Spark to process input files to generate an output file.</p>
+
+<h2>Setup</h2>
+
+<p>Install any of the following you don't already have:</p>
+
+<ol>
+    <li>Download and unpack Spark 1.6.3: http://d3kbcqa49mib13.cloudfront.net/spark-1.6.3-bin-hadoop2.6.tgz</li>
+    <li>Install Java 8: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html</li>
+    <li>Install SBT: http://www.scala-sbt.org/download.html</li>
+</ol>
+
+<h2>Problem</h2>
+
+<h3>Inputs</h3>
+
+<p>There are three input files, all of which are comma-delimited:</p>
+
+<h4>activity.csv</h4>
+
+<ul>
+    <li>Contains three fields: <code>visitorId</code>, <code>email</code>, <code>timestamp</code></li>
+    <li><code>visitorId</code> is a String representing a visitor to a website</li>
+    <li><code>email</code> is a String representing the email address of a user</li>
+    <li><code>timestamp</code> is a UTC DateTime (YYYY-MM-DD HH:MM:SS) representing the time the activity occurred</li>
+    <li>Either one or both of <code>visitorId</code>/<code>email</code> must exist, and <code>timestamp</code> always
+        exists
+    </li>
+</ul>
+
+<h4>visitors.csv</h4>
+
+<ul>
+    <li>Contains two fields: <code>visitorId</code>, <code>userId</code></li>
+    <li><code>visitorId</code> is a String representing a visitor to a website (same as in activity.csv)</li>
+    <li><code>userId</code> is an Integer representing a user in our database</li>
+</ul>
+
+<h4>users.csv</h4>
+
+<ul>
+    <li>Contains two fields: <code>userId</code>, <code>email</code></li>
+    <li><code>userId</code> is an Integer representing a user in our database (same as in visitors.csv)</li>
+    <li><code>email</code> is a String representing the email address of a user (same as in activity.csv)</li>
+</ul>
+
+<h3>Outputs</h3>
+
+<p>There are two parts to this problem. In each part, the goal is to generate an output directory with one or more
+    <code>part-</code> files with the following requirements:</p>
+
+<h4>User Activity</h4>
+
+<ul>
+    <li>Tab-delimited, with the fields: <code>userId</code> and <code>timestamp</code>.</li>
+    <li>Essentially, for each row in <code>activity.csv</code>, we want to use data from the other two files to get the
+        <code>userId</code> from the <code>visitorId</code> or <code>email</code>.
+    </li>
+    <li><strong>If a row in activity.csv has BOTH <code>visitorId</code> and <code>email</code>, the lookup should be
+        done using <code>email</code>.</strong></li>
+    <li>Example row: <code>123&lt;TAB&gt;2017-01-02 03:04:05</code></li>
+</ul>
+
+<h4>User's Best Hour(s)</h4>
+
+<ul>
+    <li>Tab-delimited, with the fields: <code>userId</code> and <code>bestHours</code>, where <code>bestHours</code> is
+        a comma-delimited field containing the top three hours of the day (in UTC) where the user has the most activity.
+    </li>
+    <li>This should use the output from "User Activity" above.</li>
+    <li><code>bestHours</code> can contain less than three hours if a user is not active in three or more hours. Users
+        with no activity should not show up in the file.
+    </li>
+    <li>The hours should be numbers between 0 and 23 inclusive.</li>
+    <li>Example row: <code>123&lt;TAB&gt;3,4,23</code></li>
+</ul>
+
+<h2>Instructions</h2>
+
+<ol>
+    <li>The entry points of the Spark applications are in ActivityRunner.scala (for "User Activity") and
+        BestHoursRunner.scala (for "User's Best Hour(s)"). Start here, but feel free to create more files as necessary.
+    </li>
+    <li>When done coding, run <code>sbt assembly</code> from the root of the project to package your project for
+        testing.
+    </li>
+</ol>
+
+<h3>To Run "User Activity"</h3>
+
+<ol>
+    <li>The application takes four command line arguments: <code>activityFile</code>, <code>visitorsFile</code>, <code>usersFile</code>,
+        and <code>outputDir</code>. These correspond to the inputs/outputs described above.
+    </li>
+    <li>Run your application on the command line like so (your jar path may be slightly different): <code>&lt;path to
+        unpacked spark&gt;/bin/spark-submit --class miniproject.ActivityRunner
+        target/scala-2.10/spark_miniproject-assembly-1.0.jar files/activity.csv files/visitors.csv files/users.csv
+        user_activity</code></li>
+    <li>The output files should be in the <code>user_activity/</code> directory.</li>
+</ol>
+
+<h3>To Run "User's Best Hour(s)"</h3>
+
+<ol>
+    <li>The application takes two command line arguments: <code>userActivityDirectory</code> and <code>outputDir</code>.
+        <code>userActivityDirectory</code> refers to the output directory from "User Activity", and
+        <code>outputDir</code> is the output directory for "User's Best Hour(s)".
+    </li>
+    <li>Run your application on the command line like so (your jar path may be slightly different): <code>&lt;path to
+        unpacked spark&gt;/bin/spark-submit --class miniproject.BestHoursRunner
+        target/scala-2.10/spark_miniproject-assembly-1.0.jar user_activity best_hours</code></li>
+    <li>The output files should be in the <code>best_hours/</code> directory.</li>
+</ol>
+
+<h2>Notes</h2>
+
+<ul>
+    <li>All files are local, no HDFS is required</li>
+    <li>Strive for production-quality code</li>
+    <li>Code should be well-organized and reusable</li>
+    <li>Although the sample files are small, your solution should be able to scale to much larger files</li>
+    <li>Use either the RDD or DataFrame API</li>
+</ul>
